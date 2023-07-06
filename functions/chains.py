@@ -1,12 +1,13 @@
 import os
-import json
 import requests
-from dotenv import find_dotenv, load_dotenv
+import json
 from langchain import OpenAI, LLMChain, PromptTemplate
 from langchain.document_loaders import UnstructuredURLLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
+from dotenv import find_dotenv, load_dotenv
+
 
 # load env variables
 load_dotenv(find_dotenv())
@@ -44,11 +45,12 @@ def find_best_article_urls(response_data, query):
     # create llm to choose best statutes or case law
     llm = OpenAI(model_name=fast, temperature=0) # type: ignore
     template = """
-    You are a world class paralegal & researcher, you are extremely good at find most relevant caselaw to certain topic;
+    You are a world class paralegal & researcher, you are extremely good at find most relevant case law to certain topic;
     {response_str}
     Above is the list of search results for the query {query}.
     Please choose the best 3 statutes or case law from the list, return ONLY an array of the urls, do not include anything else; return ONLY an array of the urls, do not include anything else
     """
+
     # Commit response_str to memory
     
     prompt_template = PromptTemplate(
@@ -73,7 +75,7 @@ def get_content_from_urls(urls):
 
     return data
 
-def summarise(data, query):
+def summarize(data, query):
     text_splitter = CharacterTextSplitter(separator="\n", chunk_size=3000, chunk_overlap=400, length_function=len)
     text = text_splitter.split_documents(data)
     embeddings = OpenAIEmbeddings() # type: ignore
@@ -100,12 +102,12 @@ def summarise(data, query):
 
     prompt_template = PromptTemplate(input_variables=["text", "query"], template=template)
 
-    summariser_chain = LLMChain(llm=llm, prompt=prompt_template, verbose=True)
+    summarizer_chain = LLMChain(llm=llm, prompt=prompt_template, verbose=True)
 
     summaries = []
     
     for chunk in enumerate(text):
-        summary = summariser_chain.predict(text=chunk, query=query)
+        summary = summarizer_chain.predict(text=chunk, query=query)
         summaries.append(summary)
 
     print(summaries)
@@ -137,3 +139,5 @@ def generate_list(summaries, query):
     ToDo_ClientAttorney = DoChain.predict(summaries_str=summaries_str, query=query)
 
     return ToDo_ClientAttorney
+
+# 

@@ -3,12 +3,13 @@ import os
 import openai
 import streamlit as st
 from dotenv import find_dotenv, load_dotenv
-from functions.chains import search, find_best_article_urls, get_content_from_urls, summarise, generate_list
+from pages.Welcome import user_input, onboard
+from functions.chains import search, find_best_article_urls, get_content_from_urls, summarize, generate_list
 
 def main():
     load_dotenv(find_dotenv())
 
-    st.set_page_config(page_title="Lemo - To-Do Action Items ", page_icon=":check:", layout="wide", initial_sidebar_state="collapsed",)
+    st.set_page_config(page_title="Lemo - To-Do Action Items ", page_icon=":judge:", layout="wide", initial_sidebar_state="collapsed",)
 
     st.header("Lemo - Your AI Paralegal  :judge:")
     openaiapi = os.getenv("OPENAI_API_KEY")
@@ -36,7 +37,7 @@ def main():
         search_results = search(query)
         urls = find_best_article_urls(search_results, query)
         data = get_content_from_urls(urls)
-        summaries = summarise(data, query)
+        summaries = summarize(data, query)
         list = generate_list(summaries, query)
 
         with st.expander("search results"):
